@@ -1,20 +1,32 @@
 package com.worksphere.hrms.controller;
 
+import com.worksphere.hrms.dto.response.ApiResponse;
+import com.worksphere.hrms.dto.response.HealthResponse;
+import com.worksphere.hrms.service.HealthService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import java.time.LocalDateTime;
 
 @RestController
 public class HealthController {
 
-    @GetMapping("/api/health")
-    public Map<String, String> healthCheck() {
+    private final HealthService healthService;
 
-        return Map.of(
-                "status", "UP",
-                "application", "WorkSphere HRMS",
-                "version", "1.0.0"
-        );
+    public HealthController(HealthService healthService) {
+        this.healthService = healthService;
     }
+
+    @GetMapping("/api/health")
+    public ApiResponse<HealthResponse> health() {
+
+        return new ApiResponse<>(
+                true,
+                "Health check successful",
+                LocalDateTime.now(),
+                healthService.healthCheck()
+        );
+
+    }
+
 }
