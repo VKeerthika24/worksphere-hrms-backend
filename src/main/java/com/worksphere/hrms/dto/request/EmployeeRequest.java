@@ -2,10 +2,16 @@ package com.worksphere.hrms.dto.request;
 
 import com.worksphere.hrms.enums.Gender;
 import jakarta.validation.constraints.*;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class EmployeeRequest {
 
     @NotBlank(message = "First name is required")
@@ -39,6 +45,4 @@ public class EmployeeRequest {
 
     @NotNull(message = "User Id is required")
     private Long userId;
-
-    // Generate Getters and Setters
 }

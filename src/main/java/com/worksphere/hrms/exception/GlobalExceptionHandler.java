@@ -40,9 +40,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneralException(Exception ex) {
 
+        ex.printStackTrace();   // Prints the real error in the console
+
         ApiResponse<Object> response = new ApiResponse<>(
                 false,
-                "Something went wrong",
+                ex.getMessage(),
                 LocalDateTime.now(),
                 null
         );
