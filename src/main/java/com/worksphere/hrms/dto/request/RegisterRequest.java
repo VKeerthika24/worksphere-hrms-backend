@@ -13,7 +13,7 @@ import lombok.*;
 @Builder
 public class RegisterRequest {
 
-    @Email(message = "Invalid email format")
+    @Email(message = "Invalid email")
     @NotBlank(message = "Email is required")
     private String email;
 
