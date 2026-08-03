@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import com.worksphere.hrms.dto.request.LoginRequest;
+import com.worksphere.hrms.dto.response.LoginResponse;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -26,6 +28,20 @@ public class AuthController {
         return new ApiResponse<>(
                 true,
                 "User registered successfully",
+                LocalDateTime.now(),
+                response
+        );
+    }
+
+    @PostMapping("/login")
+    public ApiResponse<LoginResponse> login(
+            @Valid @RequestBody LoginRequest request) {
+
+        LoginResponse response = authService.login(request);
+
+        return new ApiResponse<>(
+                true,
+                "Login successful",
                 LocalDateTime.now(),
                 response
         );

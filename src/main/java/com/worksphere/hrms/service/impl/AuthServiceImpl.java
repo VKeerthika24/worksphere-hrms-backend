@@ -17,6 +17,12 @@ import com.worksphere.hrms.repository.RoleRepository;
 import com.worksphere.hrms.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.worksphere.hrms.mapper.AuthMapper;
+
+import com.worksphere.hrms.security.JwtService;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -25,10 +31,44 @@ public class AuthServiceImpl implements AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+
+
+
 
     @Override
     public LoginResponse login(LoginRequest request) {
-        throw new UnsupportedOperationException("Login will be implemented after JWT configuration.");
+
+        // Authenticate email and password
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+
+        // Load user from database
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        // Generate JWT Token
+        UserDetails userDetails = org.springframework.security.core.userdetails.User
+                .builder()
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .authorities(user.getRole().getName().name())
+                .build();
+
+        String token = jwtService.generateToken(userDetails);
+
+        // Return Response
+        return LoginResponse.builder()
+                .token(token)
+                .email(user.getEmail())
+                .role(user.getRole().getName().name())
+                .build();
     }
 
     @Override

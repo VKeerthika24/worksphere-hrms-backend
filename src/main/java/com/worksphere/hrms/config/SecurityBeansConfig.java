@@ -21,5 +21,4 @@ public class SecurityBeansConfig {
 
         return configuration.getAuthenticationManager();
     }
-
 }
