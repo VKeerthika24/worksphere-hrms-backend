@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/api/employees")
 @RequiredArgsConstructor
@@ -73,6 +76,36 @@ public class EmployeeController {
                 "Employee deleted successfully",
                 java.time.LocalDateTime.now(),
                 "Employee deleted successfully"
+        );
+    }
+
+    @GetMapping("/search")
+    public ApiResponse<List<EmployeeResponse>> searchEmployees(
+            @RequestParam String firstName) {
+
+        List<EmployeeResponse> employees =
+                employeeService.searchEmployees(firstName);
+
+        return new ApiResponse<>(
+                true,
+                "Employees fetched successfully",
+                java.time.LocalDateTime.now(),
+                employees
+        );
+    }
+
+    @GetMapping("/page")
+    public ApiResponse<Page<EmployeeResponse>> getEmployees(
+            Pageable pageable) {
+
+        Page<EmployeeResponse> employees =
+                employeeService.getEmployees(pageable);
+
+        return new ApiResponse<>(
+                true,
+                "Employees fetched successfully",
+                java.time.LocalDateTime.now(),
+                employees
         );
     }
 }

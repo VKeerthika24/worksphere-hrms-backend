@@ -13,7 +13,8 @@ import com.worksphere.hrms.service.EmployeeService;
 import com.worksphere.hrms.util.EmployeeCodeGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @Service
@@ -110,4 +111,23 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         employeeRepository.delete(employee);
     }
+
+    @Override
+    public List<EmployeeResponse> searchEmployees(String firstName) {
+
+        return employeeRepository
+                .findByFirstNameContainingIgnoreCase(firstName)
+                .stream()
+                .map(EmployeeMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    public Page<EmployeeResponse> getEmployees(Pageable pageable) {
+
+        return employeeRepository
+                .findAll(pageable)
+                .map(EmployeeMapper::toResponse);
+    }
+
 }
