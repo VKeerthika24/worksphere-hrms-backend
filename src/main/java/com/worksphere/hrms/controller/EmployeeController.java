@@ -8,7 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import java.time.LocalDateTime;
 import java.util.List;
 @RestController
@@ -43,6 +44,35 @@ public class EmployeeController {
                 "Employees fetched successfully",
                 java.time.LocalDateTime.now(),
                 employees
+        );
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<EmployeeResponse> updateEmployee(
+            @PathVariable Long id,
+            @Valid @RequestBody EmployeeRequest request) {
+
+        EmployeeResponse response =
+                employeeService.updateEmployee(id, request);
+
+        return new ApiResponse<>(
+                true,
+                "Employee updated successfully",
+                java.time.LocalDateTime.now(),
+                response
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<String> deleteEmployee(@PathVariable Long id) {
+
+        employeeService.deleteEmployee(id);
+
+        return new ApiResponse<>(
+                true,
+                "Employee deleted successfully",
+                java.time.LocalDateTime.now(),
+                "Employee deleted successfully"
         );
     }
 }

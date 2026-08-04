@@ -63,12 +63,51 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeResponse updateEmployee(Long id, EmployeeRequest request) {
-        return null;
+    public EmployeeResponse updateEmployee(Long id,
+                                           EmployeeRequest request) {
+
+        Employee employee = employeeRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Employee not found"));
+
+        Department department = departmentRepository
+                .findById(request.getDepartmentId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Department not found"));
+
+        User user = userRepository
+                .findById(request.getUserId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        employee.setFirstName(request.getFirstName());
+        employee.setLastName(request.getLastName());
+        employee.setGender(request.getGender());
+        employee.setDateOfBirth(request.getDateOfBirth());
+        employee.setPhoneNumber(request.getPhoneNumber());
+        employee.setAddress(request.getAddress());
+        employee.setDesignation(request.getDesignation());
+        employee.setSalary(request.getSalary());
+        employee.setJoiningDate(request.getJoiningDate());
+
+        employee.setDepartment(department);
+        employee.setUser(user);
+
+        Employee updatedEmployee =
+                employeeRepository.save(employee);
+
+        return EmployeeMapper.toResponse(updatedEmployee);
     }
 
     @Override
     public void deleteEmployee(Long id) {
 
+        Employee employee = employeeRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Employee not found"));
+
+        employeeRepository.delete(employee);
     }
 }
