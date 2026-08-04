@@ -1,4 +1,48 @@
 package com.worksphere.hrms.controller;
 
+import com.worksphere.hrms.dto.request.EmployeeRequest;
+import com.worksphere.hrms.dto.response.ApiResponse;
+import com.worksphere.hrms.dto.response.EmployeeResponse;
+import com.worksphere.hrms.service.EmployeeService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+@RestController
+@RequestMapping("/api/employees")
+@RequiredArgsConstructor
 public class EmployeeController {
+
+    private final EmployeeService employeeService;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<EmployeeResponse> createEmployee(
+            @Valid @RequestBody EmployeeRequest request) {
+
+        EmployeeResponse response = employeeService.createEmployee(request);
+
+        return new ApiResponse<>(
+                true,
+                "Employee created successfully",
+                LocalDateTime.now(),
+                response
+        );
+    }
+
+    @GetMapping
+    public ApiResponse<List<EmployeeResponse>> getAllEmployees() {
+
+        List<EmployeeResponse> employees = employeeService.getAllEmployees();
+
+        return new ApiResponse<>(
+                true,
+                "Employees fetched successfully",
+                java.time.LocalDateTime.now(),
+                employees
+        );
+    }
 }

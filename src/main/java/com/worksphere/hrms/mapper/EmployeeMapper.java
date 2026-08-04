@@ -5,7 +5,7 @@ import com.worksphere.hrms.dto.response.EmployeeResponse;
 import com.worksphere.hrms.entity.Department;
 import com.worksphere.hrms.entity.Employee;
 import com.worksphere.hrms.entity.User;
-
+import com.worksphere.hrms.util.EmployeeCodeGenerator;
 public class EmployeeMapper {
 
     private EmployeeMapper() {
@@ -13,11 +13,10 @@ public class EmployeeMapper {
 
     public static Employee toEntity(EmployeeRequest request,
                                     User user,
-                                    Department department,
-                                    String employeeCode) {
+                                    Department department) {
 
         return Employee.builder()
-                .employeeCode(employeeCode)
+                .employeeCode(EmployeeCodeGenerator.generate())
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .gender(request.getGender())

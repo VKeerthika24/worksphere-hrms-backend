@@ -1,8 +1,16 @@
 package com.worksphere.hrms.service.impl;
-
 import com.worksphere.hrms.dto.request.EmployeeRequest;
 import com.worksphere.hrms.dto.response.EmployeeResponse;
+import com.worksphere.hrms.entity.Department;
+import com.worksphere.hrms.entity.Employee;
+import com.worksphere.hrms.entity.User;
+import com.worksphere.hrms.exception.ResourceNotFoundException;
+import com.worksphere.hrms.mapper.EmployeeMapper;
+import com.worksphere.hrms.repository.DepartmentRepository;
+import com.worksphere.hrms.repository.EmployeeRepository;
+import com.worksphere.hrms.repository.UserRepository;
 import com.worksphere.hrms.service.EmployeeService;
+import com.worksphere.hrms.util.EmployeeCodeGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,14 +20,41 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
-    @Override
-    public EmployeeResponse createEmployee(EmployeeRequest request) {
-        return null;
-    }
+    private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
+    private final UserRepository userRepository;
+
 
     @Override
+    public EmployeeResponse createEmployee(EmployeeRequest request) {
+
+        Department department = departmentRepository
+                .findById(request.getDepartmentId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Department not found"));
+
+        User user = userRepository
+                .findById(request.getUserId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        Employee employee =
+                EmployeeMapper.toEntity(request, user, department);
+
+        Employee savedEmployee =
+                employeeRepository.save(employee);
+
+
+
+        return EmployeeMapper.toResponse(savedEmployee);
+    }
+    @Override
     public List<EmployeeResponse> getAllEmployees() {
-        return List.of();
+
+        return employeeRepository.findAll()
+                .stream()
+                .map(EmployeeMapper::toResponse)
+                .toList();
     }
 
     @Override

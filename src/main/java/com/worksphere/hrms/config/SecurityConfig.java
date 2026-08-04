@@ -49,10 +49,10 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                        "/api/auth/**",
-                                        "/api/health",
-                                        "/api/test"
-                                ).permitAll()
+                                "/api/auth/**",
+                                "/api/health",
+                                "/api/employees/**"
+                        ).permitAll()
                         .anyRequest()
                         .authenticated()
                 )
