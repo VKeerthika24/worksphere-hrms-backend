@@ -27,6 +27,9 @@ public class Attendance {
     private LocalTime checkOut;
 
     private Double workingHours;
+    private Boolean late;
+
+    private Double overtimeHours;
 
     @Enumerated(EnumType.STRING)
     private AttendanceStatus status;

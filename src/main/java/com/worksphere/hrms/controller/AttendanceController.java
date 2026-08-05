@@ -47,4 +47,19 @@ public class AttendanceController {
                 response
         );
     }
+
+    @PostMapping("/check-out/{employeeId}")
+    public ApiResponse<AttendanceResponse> checkOut(
+            @PathVariable Long employeeId) {
+
+        AttendanceResponse response =
+                attendanceService.checkOut(employeeId);
+
+        return new ApiResponse<>(
+                true,
+                "Check-out successful",
+                LocalDateTime.now(),
+                response
+        );
+    }
 }

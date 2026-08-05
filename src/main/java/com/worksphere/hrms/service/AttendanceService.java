@@ -10,4 +10,6 @@ public interface AttendanceService {
     AttendanceResponse checkIn(AttendanceRequest request);
 
     List<AttendanceResponse> getAttendanceHistory(Long employeeId);
+
+    AttendanceResponse checkOut(Long employeeId);
 }

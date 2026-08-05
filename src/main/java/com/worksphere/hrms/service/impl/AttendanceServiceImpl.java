@@ -63,4 +63,39 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .map(AttendanceMapper::toResponse)
                 .toList();
     }
+
+    @Override
+    public AttendanceResponse checkOut(Long employeeId) {
+
+        Attendance attendance = attendanceRepository
+                .findByEmployeeIdAndAttendanceDate(
+                        employeeId,
+                        LocalDate.now())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Employee has not checked in today"));
+
+        if (attendance.getCheckOut() != null) {
+            throw new IllegalArgumentException(
+                    "Employee has already checked out today");
+        }
+
+        LocalTime checkOutTime = LocalTime.now();
+
+        attendance.setCheckOut(checkOutTime);
+
+        long minutes = java.time.Duration
+                .between(attendance.getCheckIn(), checkOutTime)
+                .toMinutes();
+
+        double workingHours =
+                Math.round((minutes / 60.0) * 100.0) / 100.0;
+
+        attendance.setWorkingHours(workingHours);
+
+        Attendance updatedAttendance =
+                attendanceRepository.save(attendance);
+
+        return AttendanceMapper.toResponse(updatedAttendance);
+    }
 }
