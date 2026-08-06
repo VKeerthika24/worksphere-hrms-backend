@@ -33,8 +33,23 @@ public class AttendanceController {
         );
     }
 
+    @PostMapping("/check-out/{employeeId}")
+    public ApiResponse<AttendanceResponse> checkOut(
+            @PathVariable Long employeeId) {
+
+        AttendanceResponse response =
+                attendanceService.checkOut(employeeId);
+
+        return new ApiResponse<>(
+                true,
+                "Check-out successful",
+                LocalDateTime.now(),
+                response
+        );
+    }
+
     @GetMapping("/{employeeId}")
-    public ApiResponse<List<AttendanceResponse>> getHistory(
+    public ApiResponse<List<AttendanceResponse>> getAttendanceHistory(
             @PathVariable Long employeeId) {
 
         List<AttendanceResponse> response =
@@ -48,16 +63,16 @@ public class AttendanceController {
         );
     }
 
-    @PostMapping("/check-out/{employeeId}")
-    public ApiResponse<AttendanceResponse> checkOut(
-            @PathVariable Long employeeId) {
+    @GetMapping("/today")
+    public ApiResponse<List<AttendanceResponse>>
+    getTodayAttendance() {
 
-        AttendanceResponse response =
-                attendanceService.checkOut(employeeId);
+        List<AttendanceResponse> response =
+                attendanceService.getTodayAttendance();
 
         return new ApiResponse<>(
                 true,
-                "Check-out successful",
+                "Today's attendance fetched successfully",
                 LocalDateTime.now(),
                 response
         );

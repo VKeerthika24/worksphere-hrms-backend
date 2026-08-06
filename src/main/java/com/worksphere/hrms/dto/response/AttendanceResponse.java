@@ -28,4 +28,8 @@ public class AttendanceResponse {
     private String employeeCode;
 
     private String employeeName;
+
+    private Boolean late;
+
+    private Double overtimeHours;
 }

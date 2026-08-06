@@ -27,8 +27,11 @@ public class Attendance {
     private LocalTime checkOut;
 
     private Double workingHours;
+
+    @Column(nullable = false)
     private Boolean late;
 
+    @Column(nullable = false)
     private Double overtimeHours;
 
     @Enumerated(EnumType.STRING)

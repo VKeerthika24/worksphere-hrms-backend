@@ -53,6 +53,7 @@ public class SecurityConfig {
                                 "/api/health",
                                 "/api/employees/**",
                                 "/api/attendance/**"
+
                         ).permitAll()
                         .anyRequest()
                         .authenticated()

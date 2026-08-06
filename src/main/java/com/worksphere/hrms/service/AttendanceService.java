@@ -9,7 +9,9 @@ public interface AttendanceService {
 
     AttendanceResponse checkIn(AttendanceRequest request);
 
+    AttendanceResponse checkOut(Long employeeId);
+
     List<AttendanceResponse> getAttendanceHistory(Long employeeId);
 
-    AttendanceResponse checkOut(Long employeeId);
+    List<AttendanceResponse> getTodayAttendance();
 }

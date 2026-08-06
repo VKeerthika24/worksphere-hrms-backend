@@ -16,12 +16,15 @@ public class AttendanceMapper {
                 .checkIn(attendance.getCheckIn())
                 .checkOut(attendance.getCheckOut())
                 .workingHours(attendance.getWorkingHours())
+                .late(attendance.getLate())
+                .overtimeHours(attendance.getOvertimeHours())
                 .status(attendance.getStatus())
                 .employeeCode(attendance.getEmployee().getEmployeeCode())
                 .employeeName(
                         attendance.getEmployee().getFirstName()
                                 + " "
-                                + attendance.getEmployee().getLastName())
+                                + attendance.getEmployee().getLastName()
+                )
                 .build();
     }
 }
