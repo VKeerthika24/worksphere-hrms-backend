@@ -10,7 +10,10 @@ import com.worksphere.hrms.mapper.AttendanceMapper;
 import com.worksphere.hrms.repository.AttendanceRepository;
 import com.worksphere.hrms.repository.EmployeeRepository;
 import com.worksphere.hrms.service.AttendanceService;
+import com.worksphere.hrms.util.LogMessages;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -21,6 +24,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AttendanceServiceImpl implements AttendanceService {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(AttendanceServiceImpl.class);
 
     private final AttendanceRepository attendanceRepository;
     private final EmployeeRepository employeeRepository;
@@ -38,6 +44,11 @@ public class AttendanceServiceImpl implements AttendanceService {
                         employee.getId(),
                         LocalDate.now())
                 .ifPresent(attendance -> {
+
+                    logger.warn(
+                            "Duplicate check-in attempt for employee {}",
+                            employee.getEmployeeCode());
+
                     throw new IllegalArgumentException(
                             "Employee has already checked in today");
                 });
@@ -57,7 +68,13 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .employee(employee)
                 .build();
 
-        Attendance savedAttendance = attendanceRepository.save(attendance);
+        Attendance savedAttendance =
+                attendanceRepository.save(attendance);
+
+        logger.info(
+                "{} : {}",
+                LogMessages.CHECK_IN,
+                employee.getEmployeeCode());
 
         return AttendanceMapper.toResponse(savedAttendance);
     }
@@ -74,6 +91,11 @@ public class AttendanceServiceImpl implements AttendanceService {
                                 "Employee has not checked in today"));
 
         if (attendance.getCheckOut() != null) {
+
+            logger.warn(
+                    "Duplicate check-out attempt for employee {}",
+                    attendance.getEmployee().getEmployeeCode());
+
             throw new IllegalArgumentException(
                     "Employee has already checked out today");
         }
@@ -111,6 +133,11 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         Attendance updatedAttendance =
                 attendanceRepository.save(attendance);
+
+        logger.info(
+                "{} : {}",
+                LogMessages.CHECK_OUT,
+                attendance.getEmployee().getEmployeeCode());
 
         return AttendanceMapper.toResponse(updatedAttendance);
     }

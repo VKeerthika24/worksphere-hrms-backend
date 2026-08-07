@@ -1,4 +1,5 @@
 package com.worksphere.hrms.service.impl;
+
 import com.worksphere.hrms.dto.request.EmployeeRequest;
 import com.worksphere.hrms.dto.response.EmployeeResponse;
 import com.worksphere.hrms.entity.Department;
@@ -10,21 +11,26 @@ import com.worksphere.hrms.repository.DepartmentRepository;
 import com.worksphere.hrms.repository.EmployeeRepository;
 import com.worksphere.hrms.repository.UserRepository;
 import com.worksphere.hrms.service.EmployeeService;
-import com.worksphere.hrms.util.EmployeeCodeGenerator;
+import com.worksphere.hrms.util.LogMessages;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
+    private static final Logger logger =
+            LoggerFactory.getLogger(EmployeeServiceImpl.class);
+
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
-
 
     @Override
     public EmployeeResponse createEmployee(EmployeeRequest request) {
@@ -45,10 +51,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee savedEmployee =
                 employeeRepository.save(employee);
 
-
+        logger.info(
+                "{} : {}",
+                LogMessages.EMPLOYEE_CREATED,
+                savedEmployee.getEmployeeCode()
+        );
 
         return EmployeeMapper.toResponse(savedEmployee);
     }
+
     @Override
     public List<EmployeeResponse> getAllEmployees() {
 
@@ -60,12 +71,19 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeResponse getEmployeeById(Long id) {
-        return null;
+
+        Employee employee = employeeRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Employee not found"));
+
+        return EmployeeMapper.toResponse(employee);
     }
 
     @Override
-    public EmployeeResponse updateEmployee(Long id,
-                                           EmployeeRequest request) {
+    public EmployeeResponse updateEmployee(
+            Long id,
+            EmployeeRequest request) {
 
         Employee employee = employeeRepository
                 .findById(id)
@@ -91,12 +109,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setDesignation(request.getDesignation());
         employee.setSalary(request.getSalary());
         employee.setJoiningDate(request.getJoiningDate());
-
         employee.setDepartment(department);
         employee.setUser(user);
 
         Employee updatedEmployee =
                 employeeRepository.save(employee);
+
+        logger.info(
+                "{} : {}",
+                LogMessages.EMPLOYEE_UPDATED,
+                updatedEmployee.getEmployeeCode()
+        );
 
         return EmployeeMapper.toResponse(updatedEmployee);
     }
@@ -110,6 +133,12 @@ public class EmployeeServiceImpl implements EmployeeService {
                         new ResourceNotFoundException("Employee not found"));
 
         employeeRepository.delete(employee);
+
+        logger.info(
+                "{} : {}",
+                LogMessages.EMPLOYEE_DELETED,
+                employee.getEmployeeCode()
+        );
     }
 
     @Override
@@ -129,5 +158,4 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .findAll(pageable)
                 .map(EmployeeMapper::toResponse);
     }
-
 }

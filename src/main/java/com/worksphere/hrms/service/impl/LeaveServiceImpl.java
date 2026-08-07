@@ -4,13 +4,16 @@ import com.worksphere.hrms.dto.request.LeaveRequest;
 import com.worksphere.hrms.dto.response.LeaveResponse;
 import com.worksphere.hrms.entity.Employee;
 import com.worksphere.hrms.entity.Leave;
+import com.worksphere.hrms.enums.LeaveStatus;
 import com.worksphere.hrms.exception.ResourceNotFoundException;
 import com.worksphere.hrms.mapper.LeaveMapper;
 import com.worksphere.hrms.repository.EmployeeRepository;
 import com.worksphere.hrms.repository.LeaveRepository;
 import com.worksphere.hrms.service.LeaveService;
-import com.worksphere.hrms.enums.LeaveStatus;
+import com.worksphere.hrms.util.LogMessages;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +21,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class LeaveServiceImpl implements LeaveService {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(LeaveServiceImpl.class);
 
     private final LeaveRepository leaveRepository;
     private final EmployeeRepository employeeRepository;
@@ -39,6 +45,12 @@ public class LeaveServiceImpl implements LeaveService {
 
         Leave savedLeave = leaveRepository.save(leave);
 
+        logger.info(
+                "{} : {}",
+                LogMessages.LEAVE_APPLIED,
+                employee.getEmployeeCode()
+        );
+
         return LeaveMapper.toResponse(savedLeave);
     }
 
@@ -51,6 +63,7 @@ public class LeaveServiceImpl implements LeaveService {
                 .map(LeaveMapper::toResponse)
                 .toList();
     }
+
     @Override
     public LeaveResponse approveLeave(Long leaveId) {
 
@@ -60,7 +73,6 @@ public class LeaveServiceImpl implements LeaveService {
                         new ResourceNotFoundException("Leave not found"));
 
         if (leave.getStatus() != LeaveStatus.PENDING) {
-
             throw new IllegalArgumentException(
                     "Leave request already processed");
         }
@@ -68,6 +80,12 @@ public class LeaveServiceImpl implements LeaveService {
         leave.setStatus(LeaveStatus.APPROVED);
 
         Leave updatedLeave = leaveRepository.save(leave);
+
+        logger.info(
+                "{} : {}",
+                LogMessages.LEAVE_APPROVED,
+                leave.getEmployee().getEmployeeCode()
+        );
 
         return LeaveMapper.toResponse(updatedLeave);
     }
@@ -81,7 +99,6 @@ public class LeaveServiceImpl implements LeaveService {
                         new ResourceNotFoundException("Leave not found"));
 
         if (leave.getStatus() != LeaveStatus.PENDING) {
-
             throw new IllegalArgumentException(
                     "Leave request already processed");
         }
@@ -89,6 +106,12 @@ public class LeaveServiceImpl implements LeaveService {
         leave.setStatus(LeaveStatus.REJECTED);
 
         Leave updatedLeave = leaveRepository.save(leave);
+
+        logger.info(
+                "{} : {}",
+                LogMessages.LEAVE_REJECTED,
+                leave.getEmployee().getEmployeeCode()
+        );
 
         return LeaveMapper.toResponse(updatedLeave);
     }
