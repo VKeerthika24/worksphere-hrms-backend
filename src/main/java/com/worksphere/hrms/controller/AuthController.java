@@ -4,6 +4,7 @@ import com.worksphere.hrms.dto.request.RegisterRequest;
 import com.worksphere.hrms.dto.response.ApiResponse;
 import com.worksphere.hrms.dto.response.RegisterResponse;
 import com.worksphere.hrms.service.AuthService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import com.worksphere.hrms.dto.request.LoginRequest;
 import com.worksphere.hrms.dto.response.LoginResponse;
-
+@Tag(
+        name = "Authentication",
+        description = "Register and Login APIs"
+)
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor

@@ -4,6 +4,7 @@ import com.worksphere.hrms.dto.request.EmployeeRequest;
 import com.worksphere.hrms.dto.response.ApiResponse;
 import com.worksphere.hrms.dto.response.EmployeeResponse;
 import com.worksphere.hrms.service.EmployeeService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,10 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestParam;
+@Tag(
+        name = "Employee Management",
+        description = "Employee CRUD APIs"
+)
 @RestController
 @RequestMapping("/api/employees")
 @RequiredArgsConstructor

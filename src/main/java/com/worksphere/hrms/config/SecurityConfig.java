@@ -54,7 +54,10 @@ public class SecurityConfig {
                                 "/api/employees/**",
                                 "/api/attendance/**",
                                 "/api/leaves/**",
-                                "/api/dashboard/**"
+                                "/api/dashboard/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
 
                         ).permitAll()
                         .anyRequest()

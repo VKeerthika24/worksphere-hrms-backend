@@ -4,13 +4,17 @@ import com.worksphere.hrms.dto.request.AttendanceRequest;
 import com.worksphere.hrms.dto.response.ApiResponse;
 import com.worksphere.hrms.dto.response.AttendanceResponse;
 import com.worksphere.hrms.service.AttendanceService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+@Tag(
+        name = "Attendance",
+        description = "Attendance Management APIs"
+)
 @RestController
 @RequestMapping("/api/attendance")
 @RequiredArgsConstructor
