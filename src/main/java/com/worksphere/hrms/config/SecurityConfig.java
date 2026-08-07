@@ -53,7 +53,8 @@ public class SecurityConfig {
                                 "/api/health",
                                 "/api/employees/**",
                                 "/api/attendance/**",
-                                "/api/leaves/**"
+                                "/api/leaves/**",
+                                "/api/dashboard/**"
 
                         ).permitAll()
                         .anyRequest()
