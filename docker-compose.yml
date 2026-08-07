@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+
+  postgres:
+    image: postgres:16
+
+    container_name: worksphere-postgres
+
+    restart: always
+
+    environment:
+      POSTGRES_DB: worksphere_hrms
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+
+    image: worksphere-hrms
+
+    container_name: worksphere-backend
+
+    restart: always
+
+    depends_on:
+      - postgres
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/worksphere_hrms
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
+
+volumes:
+
+  postgres_data:
