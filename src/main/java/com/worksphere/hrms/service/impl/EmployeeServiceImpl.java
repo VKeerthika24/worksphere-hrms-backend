@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
+import com.worksphere.hrms.enums.EmployeeStatus;
 import java.util.List;
 
 @Service
@@ -132,7 +132,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Employee not found"));
 
-        employeeRepository.delete(employee);
+        employee.setStatus(EmployeeStatus.INACTIVE);
+
+        employeeRepository.save(employee);
 
         logger.info(
                 "{} : {}",

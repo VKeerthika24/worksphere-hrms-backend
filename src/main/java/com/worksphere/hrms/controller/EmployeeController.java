@@ -55,6 +55,21 @@ public class EmployeeController {
         );
     }
 
+    @GetMapping("/{id}")
+    public ApiResponse<EmployeeResponse> getEmployeeById(
+            @PathVariable Long id) {
+
+        EmployeeResponse employee =
+                employeeService.getEmployeeById(id);
+
+        return new ApiResponse<>(
+                true,
+                "Employee fetched successfully",
+                LocalDateTime.now(),
+                employee
+        );
+    }
+
     @PutMapping("/{id}")
     public ApiResponse<EmployeeResponse> updateEmployee(
             @PathVariable Long id,
@@ -113,4 +128,6 @@ public class EmployeeController {
                 employees
         );
     }
+
+
 }
