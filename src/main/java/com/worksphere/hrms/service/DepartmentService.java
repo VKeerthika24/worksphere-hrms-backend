@@ -1,19 +1,18 @@
 package com.worksphere.hrms.service;
 
 import com.worksphere.hrms.entity.Department;
-import com.worksphere.hrms.repository.DepartmentRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class DepartmentService {
+public interface DepartmentService {
 
-    private final DepartmentRepository departmentRepository;
+    Department createDepartment(Department department);
 
-    public List<Department> getAllDepartments() {
-        return departmentRepository.findAll();
-    }
+    List<Department> getAllDepartments();
+
+    Department getDepartmentById(Long id);
+
+    Department updateDepartment(Long id, Department department);
+
+    void deleteDepartment(Long id);
 }
