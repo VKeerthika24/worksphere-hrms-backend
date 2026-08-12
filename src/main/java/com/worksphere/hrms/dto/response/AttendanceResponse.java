@@ -15,6 +15,8 @@ public class AttendanceResponse {
 
     private Long id;
 
+    private Long employeeId;
+
     private LocalDate attendanceDate;
 
     private LocalTime checkIn;

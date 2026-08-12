@@ -8,23 +8,61 @@ public class AttendanceMapper {
     private AttendanceMapper() {
     }
 
-    public static AttendanceResponse toResponse(Attendance attendance) {
+    public static AttendanceResponse toResponse(
+            Attendance attendance) {
 
         return AttendanceResponse.builder()
+
                 .id(attendance.getId())
-                .attendanceDate(attendance.getAttendanceDate())
-                .checkIn(attendance.getCheckIn())
-                .checkOut(attendance.getCheckOut())
-                .workingHours(attendance.getWorkingHours())
-                .late(attendance.getLate())
-                .overtimeHours(attendance.getOvertimeHours())
-                .status(attendance.getStatus())
-                .employeeCode(attendance.getEmployee().getEmployeeCode())
-                .employeeName(
-                        attendance.getEmployee().getFirstName()
-                                + " "
-                                + attendance.getEmployee().getLastName()
+
+                .employeeId(
+                        attendance.getEmployee().getId()
                 )
+
+                .attendanceDate(
+                        attendance.getAttendanceDate()
+                )
+
+                .checkIn(
+                        attendance.getCheckIn()
+                )
+
+                .checkOut(
+                        attendance.getCheckOut()
+                )
+
+                .workingHours(
+                        attendance.getWorkingHours()
+                )
+
+                .late(
+                        attendance.getLate()
+                )
+
+                .overtimeHours(
+                        attendance.getOvertimeHours()
+                )
+
+                .status(
+                        attendance.getStatus()
+                )
+
+                .employeeCode(
+                        attendance
+                                .getEmployee()
+                                .getEmployeeCode()
+                )
+
+                .employeeName(
+                        attendance
+                                .getEmployee()
+                                .getFirstName()
+                                + " "
+                                + attendance
+                                .getEmployee()
+                                .getLastName()
+                )
+
                 .build();
     }
 }
