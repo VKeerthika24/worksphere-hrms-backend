@@ -17,57 +17,136 @@ import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
-public class DashboardServiceImpl implements DashboardService {
+public class DashboardServiceImpl
+        implements DashboardService {
 
     private static final Logger logger =
-            LoggerFactory.getLogger(DashboardServiceImpl.class);
+            LoggerFactory.getLogger(
+                    DashboardServiceImpl.class
+            );
 
     private final EmployeeRepository employeeRepository;
+
     private final DepartmentRepository departmentRepository;
+
     private final AttendanceRepository attendanceRepository;
+
     private final LeaveRepository leaveRepository;
+
 
     @Override
     public DashboardResponse getDashboard() {
 
         LocalDate today = LocalDate.now();
 
-        DashboardResponse dashboard = DashboardResponse.builder()
-                .totalEmployees(employeeRepository.count())
-                .totalDepartments(departmentRepository.count())
-                .presentToday(
-                        attendanceRepository.countByAttendanceDate(today)
-                )
-                .lateToday(
-                        attendanceRepository
-                                .countByAttendanceDateAndLate(
-                                        today,
-                                        true
-                                )
-                )
-                .employeesOnLeave(
-                        leaveRepository
-                                .countByStatusAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
-                                        LeaveStatus.APPROVED,
-                                        today,
-                                        today
-                                )
-                )
-                .pendingLeaves(
-                        leaveRepository.countByStatus(
-                                LeaveStatus.PENDING)
-                )
-                .approvedLeaves(
-                        leaveRepository.countByStatus(
-                                LeaveStatus.APPROVED)
-                )
-                .rejectedLeaves(
-                        leaveRepository.countByStatus(
-                                LeaveStatus.REJECTED)
-                )
-                .build();
 
-        logger.info(LogMessages.DASHBOARD_FETCHED);
+        // =========================
+        // DASHBOARD STATISTICS
+        // =========================
+
+        long totalEmployees =
+                employeeRepository.count();
+
+        long totalDepartments =
+                departmentRepository.count();
+
+        long presentToday =
+                attendanceRepository
+                        .countByAttendanceDate(today);
+
+        long lateToday =
+                attendanceRepository
+                        .countByAttendanceDateAndLate(
+                                today,
+                                true
+                        );
+
+        long employeesOnLeave =
+                leaveRepository
+                        .countByStatusAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                                LeaveStatus.APPROVED,
+                                today,
+                                today
+                        );
+
+        long pendingLeaves =
+                leaveRepository
+                        .countByStatus(
+                                LeaveStatus.PENDING
+                        );
+
+        long approvedLeaves =
+                leaveRepository
+                        .countByStatus(
+                                LeaveStatus.APPROVED
+                        );
+
+        long rejectedLeaves =
+                leaveRepository
+                        .countByStatus(
+                                LeaveStatus.REJECTED
+                        );
+
+
+        // =========================
+        // AVERAGE WORKING HOURS
+        // =========================
+
+        Double averageWorkingHours =
+                attendanceRepository
+                        .calculateAverageWorkingHours(today);
+
+
+        // =========================
+        // BUILD RESPONSE
+        // =========================
+
+        DashboardResponse dashboard =
+                DashboardResponse.builder()
+
+                        .totalEmployees(
+                                totalEmployees
+                        )
+
+                        .totalDepartments(
+                                totalDepartments
+                        )
+
+                        .presentToday(
+                                presentToday
+                        )
+
+                        .lateToday(
+                                lateToday
+                        )
+
+                        .employeesOnLeave(
+                                employeesOnLeave
+                        )
+
+                        .pendingLeaves(
+                                pendingLeaves
+                        )
+
+                        .approvedLeaves(
+                                approvedLeaves
+                        )
+
+                        .rejectedLeaves(
+                                rejectedLeaves
+                        )
+
+                        .averageWorkingHours(
+                                averageWorkingHours
+                        )
+
+                        .build();
+
+
+        logger.info(
+                LogMessages.DASHBOARD_FETCHED
+        );
+
 
         return dashboard;
     }
