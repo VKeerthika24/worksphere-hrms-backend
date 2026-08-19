@@ -9,11 +9,15 @@ import com.worksphere.hrms.exception.ResourceNotFoundException;
 import com.worksphere.hrms.mapper.LeaveMapper;
 import com.worksphere.hrms.repository.EmployeeRepository;
 import com.worksphere.hrms.repository.LeaveRepository;
+import com.worksphere.hrms.security.CurrentUserService;
 import com.worksphere.hrms.service.LeaveService;
 import com.worksphere.hrms.util.LogMessages;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,23 +31,35 @@ public class LeaveServiceImpl implements LeaveService {
 
     private final LeaveRepository leaveRepository;
     private final EmployeeRepository employeeRepository;
+    private final CurrentUserService currentUserService;
+
+
+    // =====================================================
+    // APPLY LEAVE
+    // =====================================================
 
     @Override
     public LeaveResponse applyLeave(LeaveRequest request) {
 
-        Employee employee = employeeRepository
-                .findById(request.getEmployeeId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Employee not found"));
+        Employee employee =
+                getTargetEmployee(request.getEmployeeId());
 
-        if (request.getEndDate().isBefore(request.getStartDate())) {
+        if (request.getEndDate()
+                .isBefore(request.getStartDate())) {
+
             throw new IllegalArgumentException(
-                    "End date cannot be before start date");
+                    "End date cannot be before start date"
+            );
         }
 
-        Leave leave = LeaveMapper.toEntity(request, employee);
+        Leave leave =
+                LeaveMapper.toEntity(
+                        request,
+                        employee
+                );
 
-        Leave savedLeave = leaveRepository.save(leave);
+        Leave savedLeave =
+                leaveRepository.save(leave);
 
         logger.info(
                 "{} : {}",
@@ -54,32 +70,55 @@ public class LeaveServiceImpl implements LeaveService {
         return LeaveMapper.toResponse(savedLeave);
     }
 
+
+    // =====================================================
+    // GET EMPLOYEE LEAVES
+    // =====================================================
+
     @Override
-    public List<LeaveResponse> getEmployeeLeaves(Long employeeId) {
+    public List<LeaveResponse> getEmployeeLeaves(
+            Long employeeId) {
+
+        Employee employee =
+                getTargetEmployee(employeeId);
 
         return leaveRepository
-                .findByEmployeeId(employeeId)
+                .findByEmployeeId(employee.getId())
                 .stream()
                 .map(LeaveMapper::toResponse)
                 .toList();
     }
 
+
+    // =====================================================
+    // APPROVE LEAVE
+    // =====================================================
+
     @Override
     public LeaveResponse approveLeave(Long leaveId) {
 
-        Leave leave = leaveRepository
-                .findById(leaveId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Leave not found"));
+        Leave leave =
+                leaveRepository
+                        .findById(leaveId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Leave not found"
+                                )
+                        );
 
         if (leave.getStatus() != LeaveStatus.PENDING) {
+
             throw new IllegalArgumentException(
-                    "Leave request already processed");
+                    "Leave request already processed"
+            );
         }
 
-        leave.setStatus(LeaveStatus.APPROVED);
+        leave.setStatus(
+                LeaveStatus.APPROVED
+        );
 
-        Leave updatedLeave = leaveRepository.save(leave);
+        Leave updatedLeave =
+                leaveRepository.save(leave);
 
         logger.info(
                 "{} : {}",
@@ -87,25 +126,41 @@ public class LeaveServiceImpl implements LeaveService {
                 leave.getEmployee().getEmployeeCode()
         );
 
-        return LeaveMapper.toResponse(updatedLeave);
+        return LeaveMapper.toResponse(
+                updatedLeave
+        );
     }
+
+
+    // =====================================================
+    // REJECT LEAVE
+    // =====================================================
 
     @Override
     public LeaveResponse rejectLeave(Long leaveId) {
 
-        Leave leave = leaveRepository
-                .findById(leaveId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Leave not found"));
+        Leave leave =
+                leaveRepository
+                        .findById(leaveId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Leave not found"
+                                )
+                        );
 
         if (leave.getStatus() != LeaveStatus.PENDING) {
+
             throw new IllegalArgumentException(
-                    "Leave request already processed");
+                    "Leave request already processed"
+            );
         }
 
-        leave.setStatus(LeaveStatus.REJECTED);
+        leave.setStatus(
+                LeaveStatus.REJECTED
+        );
 
-        Leave updatedLeave = leaveRepository.save(leave);
+        Leave updatedLeave =
+                leaveRepository.save(leave);
 
         logger.info(
                 "{} : {}",
@@ -113,15 +168,90 @@ public class LeaveServiceImpl implements LeaveService {
                 leave.getEmployee().getEmployeeCode()
         );
 
-        return LeaveMapper.toResponse(updatedLeave);
+        return LeaveMapper.toResponse(
+                updatedLeave
+        );
     }
+
+
+    // =====================================================
+    // GET ALL LEAVES
+    // =====================================================
 
     @Override
     public List<LeaveResponse> getAllLeaves() {
 
-        return leaveRepository.findAll()
+        return leaveRepository
+                .findAll()
                 .stream()
                 .map(LeaveMapper::toResponse)
                 .toList();
+    }
+
+
+    // =====================================================
+    // TARGET EMPLOYEE
+    // =====================================================
+
+    private Employee getTargetEmployee(
+            Long requestedEmployeeId) {
+
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        if (authentication == null ||
+                !authentication.isAuthenticated()) {
+
+            throw new IllegalStateException(
+                    "User is not authenticated"
+            );
+        }
+
+        boolean isEmployee =
+                authentication.getAuthorities()
+                        .stream()
+                        .anyMatch(authority ->
+                                authority
+                                        .getAuthority()
+                                        .equals("EMPLOYEE")
+                        );
+
+
+        // -----------------------------------------------
+        // EMPLOYEE
+        // -----------------------------------------------
+
+        if (isEmployee) {
+
+            Employee currentEmployee =
+                    currentUserService
+                            .getCurrentEmployee();
+
+            if (requestedEmployeeId != null &&
+                    !currentEmployee.getId()
+                            .equals(requestedEmployeeId)) {
+
+                throw new AccessDeniedException(
+                        "You can access only your own leaves"
+                );
+            }
+
+            return currentEmployee;
+        }
+
+
+        // -----------------------------------------------
+        // ADMIN / MANAGER
+        // -----------------------------------------------
+
+        return employeeRepository
+                .findById(requestedEmployeeId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Employee not found"
+                        )
+                );
     }
 }

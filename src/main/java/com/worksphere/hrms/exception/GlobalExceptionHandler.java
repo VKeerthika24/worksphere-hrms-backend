@@ -4,6 +4,7 @@ import com.worksphere.hrms.dto.response.ApiResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -80,9 +81,10 @@ public class GlobalExceptionHandler {
         );
     }
 
+
     // =========================
-// INVALID REQUEST
-// =========================
+    // INVALID REQUEST
+    // =========================
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<Object>> handleIllegalArgumentException(
@@ -99,6 +101,29 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(
                 response,
                 HttpStatus.BAD_REQUEST
+        );
+    }
+
+
+    // =========================
+    // ACCESS DENIED
+    // =========================
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAccessDenied(
+            AccessDeniedException ex) {
+
+        ApiResponse<Object> response =
+                new ApiResponse<>(
+                        false,
+                        ex.getMessage(),
+                        LocalDateTime.now(),
+                        null
+                );
+
+        return new ResponseEntity<>(
+                response,
+                HttpStatus.FORBIDDEN
         );
     }
 
