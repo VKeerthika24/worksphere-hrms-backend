@@ -160,4 +160,17 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .findAll(pageable)
                 .map(EmployeeMapper::toResponse);
     }
+
+    @Override
+    public EmployeeResponse getCurrentEmployee(String email) {
+
+        Employee employee = employeeRepository
+                .findByUserEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Employee profile not found"
+                        ));
+
+        return EmployeeMapper.toResponse(employee);
+    }
 }

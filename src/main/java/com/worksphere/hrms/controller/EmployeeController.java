@@ -16,6 +16,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.core.userdetails.UserDetails;
+
 @Tag(
         name = "Employee Management",
         description = "Employee CRUD APIs"
@@ -65,6 +67,24 @@ public class EmployeeController {
         return new ApiResponse<>(
                 true,
                 "Employee fetched successfully",
+                LocalDateTime.now(),
+                employee
+        );
+    }
+
+    @GetMapping("/me")
+    public ApiResponse<EmployeeResponse> getCurrentEmployee(
+            @org.springframework.security.core.annotation.AuthenticationPrincipal
+            UserDetails userDetails) {
+
+        EmployeeResponse employee =
+                employeeService.getCurrentEmployee(
+                        userDetails.getUsername()
+                );
+
+        return new ApiResponse<>(
+                true,
+                "Current employee fetched successfully",
                 LocalDateTime.now(),
                 employee
         );

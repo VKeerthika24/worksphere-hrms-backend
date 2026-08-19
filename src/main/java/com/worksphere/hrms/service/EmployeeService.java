@@ -21,4 +21,6 @@ public interface EmployeeService {
     List<EmployeeResponse> searchEmployees(String firstName);
 
     Page<EmployeeResponse> getEmployees(Pageable pageable);
+
+    EmployeeResponse getCurrentEmployee(String email);
 }

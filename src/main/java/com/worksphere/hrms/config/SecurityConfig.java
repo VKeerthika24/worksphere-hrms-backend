@@ -110,7 +110,24 @@ public class SecurityConfig {
 
 
                     // -------------------------
-                    // EMPLOYEES
+                    // CURRENT EMPLOYEE PROFILE
+                    // IMPORTANT:
+                    // This MUST come before
+                    // /api/employees/**
+                    // -------------------------
+
+                    auth.requestMatchers(
+                            "/api/employees/me"
+                    ).hasAnyAuthority(
+                            "ADMIN",
+                            "MANAGER",
+                            "EMPLOYEE"
+                    );
+
+
+                    // -------------------------
+                    // EMPLOYEE MANAGEMENT
+                    // ADMIN + MANAGER ONLY
                     // -------------------------
 
                     auth.requestMatchers(
@@ -148,6 +165,7 @@ public class SecurityConfig {
 
                     // -------------------------
                     // LEAVE APPROVAL
+                    // MANAGER + ADMIN ONLY
                     // -------------------------
 
                     auth.requestMatchers(
